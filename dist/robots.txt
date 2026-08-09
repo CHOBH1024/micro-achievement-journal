@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://pomyjo.com/micro-achievement-journal/sitemap.xml
+Sitemap: https://pomyjo.com/micro-achievement-journal/rss.xml
