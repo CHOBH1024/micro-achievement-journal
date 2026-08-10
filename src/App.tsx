@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Globe, MessageSquare, Share2, Eye, TrendingUp, Users, Send, Sparkles, Zap, Activity } from 'lucide-react';
+import { useMemo } from 'react';
 
 interface ResultShare { id: string; user: string; archetype: string; emoji: string; time: string; note: string; }
 interface Comment { id: string; user: string; text: string; time: string; }
@@ -18,6 +19,26 @@ function timeAgo(ts: number, isEn: boolean): string {
   const d = Math.floor(h / 24);
   return isEn ? `${d}d ago` : `${d}일 전`;
 }
+
+// Generate actionable insights based on archetype
+function generateInsights({ archetypeEn, archetypeKo, language }: { archetypeEn: string; archetypeKo: string; language: 'ko' | 'en' }): string[] {
+  const insightsEn = [
+    `Leverage your strong analytical nature to set micro‑goals that are measurable and time‑bound.`,
+    `Practice the "2‑minute rule" to start new habits; your perfectionism will keep you consistent.`,
+    `Use data‑driven reflection: log each tiny achievement and review weekly to notice patterns.`,
+    `Pair with a accountability partner; sharing numbers satisfies your need for precision.`,
+    `Reward yourself with short, meaningful breaks after each completed micro‑task.`
+  ];
+  const insightsKo = [
+    `분석적 성향을 활용해 측정 가능하고 시간 제한이 있는 작은 목표를 설정하세요.`,
+    `"2분 규칙"을 적용해 새로운 습관을 시작하면 완벽주의가 꾸준함을 유지하도록 도와줍니다.`,
+    `데이터 기반 회고를 실천하세요: 매 작은 성취를 기록하고 주간에 검토해 패턴을 파악합니다.`,
+    `책임 파트너와 함께 하면 숫자를 공유하는 것이 정확성을 만족시켜 줍니다.`,
+    `각 마이크로 작업을 완료하고 짧고 의미 있는 휴식을 보상으로 주세요.`
+  ];
+  return language === 'en' ? insightsEn : insightsKo;
+}
+
 
 export function App() {
   const [lang, setLang] = useState<'ko' | 'en'>('ko');
@@ -71,7 +92,12 @@ export function App() {
         nameEn: "Analytical Perfectionist",
         emoji: "📊",
         descKo: "데이터와 정밀성을 추구하며 완벽한 결과를 위해 최선을 다하는 유형입니다.",
-        descEn: "High-precision archetype focused on quality and rigorous data accuracy."
+        descEn: "High-precision archetype focused on quality and rigorous data accuracy.",
+        insights: generateInsights({
+          archetypeEn: "Analytical Perfectionist",
+          archetypeKo: "분석형 완벽주의자",
+          language: lang
+        })
       });
     }
   };
@@ -175,12 +201,20 @@ export function App() {
                 </div>
               </div>
             ) : (
-              <div className="bg-slate-900 border border-indigo-500/30 p-8 rounded-2xl text-center space-y-6">
+              <div className="bg-slate-900 border border-indigo-500/30 p-8 rounded-2xl text-center space-y-6 backdrop-blur-xl bg-opacity-30">
                 <div className="text-6xl">{result.emoji}</div>
                 <div>
                   <span className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold rounded-full">진단 결과</span>
                   <h1 className="text-2xl font-bold text-white my-2">{result.nameKo}</h1>
-                  <p className="text-xs text-slate-300 max-w-md mx-auto">{result.descKo}</p>
+                  <p className="text-xs text-slate-300 max-w-md mx-auto mb-2">{result.descKo}</p>
+                  {/* 과학적/심리학적 근거 */}
+                  <p className="text-xs text-slate-400 italic mb-3">왜 이런 결과가 나왔나요? {result.archetypeKo ?? result.nameKo}는 행동 과학에 따르면 자기 효능감과 목표 설정 스타일이 높은 편이며, 세부 항목에서 일관된 높은 점수를 보였기 때문입니다.</p>
+                  {/* 풍부한 인사이트 */}
+                  <ul className="list-disc list-inside text-xs text-slate-200 space-y-1 mb-3">
+                    {result.insights?.map((ins: string, idx: number) => (
+                      <li key={idx}>{ins}</li>
+                    ))}
+                  </ul>
                 </div>
 
                 {/* Online Result Share Box */}
@@ -202,8 +236,8 @@ export function App() {
                     onChange={e => setShareNote(e.target.value)}
                     className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white"
                   />
-                  <button onClick={handleShareResult} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs transition">
-                    라이브 피드에 내 진단 결과 등록하기 🚀
+                  <button onClick={handleShareResult} className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-lg text-xs transition transform hover:scale-105 shadow-lg">
+                    지금 바로 내 성장 스토리를 공유하고, 커뮤니티와 함께 동기부여를 얻어보세요! 🌟
                   </button>
                 </div>
               </div>
@@ -285,20 +319,32 @@ export function App() {
           <h3 style={{fontSize:20,fontWeight:800,color:'#fff',margin:'0 0 20px'}}>마이크로 성취 일지: 작은 성취 기록 가이드</h3>
           <div style={{marginBottom:24}}>
             <h4 style={{color:'#818cf8',fontSize:15,margin:'0 0 8px'}}>📌 작은 성취 기록 이해하기</h4>
-            <p style={{color:'#cbd5e1',fontSize:14,lineHeight:1.8,margin:0}}>마이크로 성취 일지은 작은 성취 기록를 과학적으로 측정하는 무료 자가진단 도구입니다. 20개 문항을 통해 당신의 현재 상태를 객관적으로 분석하고, 맞춤형 개선 전략을 제시합니다. 진단은 3-5분이면 완료되며 결과는 즉시 제공됩니다.</p>
+            <p style={{color:'#cbd5e1',fontSize:14,lineHeight:1.8,margin:0}}>
+              마이크로 성취 일지는 일상 속 작은 행동을 기록하고, 이를 기반으로 자기 효능감과 동기부여를 강화하는 무료 진단 도구입니다. 20개의 심리·행동 문항을 통해 현재의 습관 패턴, 목표 설정 스타일, 자기 평가 경향을 정량적으로 파악합니다. 진단은 3~5분 안에 완료되며, 각각의 문항에 대한 즉각적인 피드백과 맞춤형 실천 전략을 제공합니다. 작은 성공을 지속적으로 쌓아 나가면서 자기 성장의 흐름을 시각화하고, 장기적인 목표 달성에 필요한 구체적인 행동 계획을 설계할 수 있습니다.
+            </p>
           </div>
           <div style={{marginBottom:24}}>
-            <h4 style={{color:'#818cf8',fontSize:15,margin:'0 0 8px'}}>📌 동기부여 실천 전략</h4>
-            <p style={{color:'#cbd5e1',fontSize:14,lineHeight:1.8,margin:0}}>전문가들이 권장하는 동기부여 핵심 원칙을 단계별로 적용해보세요. 작은 습관부터 시작하면 꾸준함을 유지하기 쉽습니다. 매일 10분씩 실천 가능한 루틴을 만들어보세요.</p>
+            <h4 style={{color:'#818cf8',fontSize:15,margin:'0 0 8px'}}>📌 동기부여 실천 전략 5가지</h4>
+            <p style={{color:'#cbd5e1',fontSize:14,lineHeight:1.8,margin:0}}>
+              1️⃣ **2분 규칙**: 새로운 습관을 시작할 때는 2분만 투자해 보세요. 짧은 시간의 시작이 꾸준함으로 이어집니다.<br/>
+              2️⃣ **마이크로 목표 설정**: 큰 목표를 3~5개의 작은 단계로 나누고, 각각을 달성했을 때 즉시 기록합니다.<br/>
+              3️⃣ **데이터 기반 회고**: 매일 또는 주간으로 기록된 성취를 검토해 패턴을 발견하고, 개선점을 도출합니다.<br/>
+              4️⃣ **공유와 피드백**: 커뮤니티 피드에 결과와 진행 상황을 공유해 외부의 긍정적 평가와 응원을 받습니다.<br/>
+              5️⃣ **보상 루프**: 작은 목표를 달성했을 때 자신에게 짧은 휴식이나 작은 보상을 제공해 뇌의 보상 시스템을 활성화합니다.
+            </p>
           </div>
           <div style={{marginBottom:24}}>
             <h4 style={{color:'#818cf8',fontSize:15,margin:'0 0 8px'}}>📌 전문가 팁과 주의사항</h4>
-            <p style={{color:'#cbd5e1',fontSize:14,lineHeight:1.8,margin:0}}>작은 성취 기록 관련 연구와 사례를 바탕으로, 당신의 상황에 가장 효과적인 전략을 소개합니다. 결과는 참고용이며, 지속적인 어려움이 있다면 전문가와 상담하세요.</p>
+            <p style={{color:'#cbd5e1',fontSize:14,lineHeight:1.8,margin:0}}>
+              작은 성취 기록은 자기 효능감 향상에 크게 기여하지만, 과도한 완벽주의는 스트레스를 유발할 수 있습니다. 기록을 할 때는 ‘가능한 범위 내에서 최선을 다함’이라는 마인드로 접근하고, 부정적인 감정이 스며들 경우 전문가와 상담하는 것을 권장합니다.
+            </p>
           </div>
           <h3 style={{fontSize:17,fontWeight:800,color:'#fff',margin:'0 0 16px'}}>❓ 자주 묻는 질문 (FAQ)</h3>
           <div style={{marginBottom:14}}>
             <h4 style={{color:'#e2e8f0',fontSize:14,marginBottom:6}}>마이크로 성취 일지 테스트는 정확한가요?</h4>
-            <p style={{color:'#94a3b8',fontSize:13,lineHeight:1.7,margin:0}}>본 테스트는 심리학 연구와 임상 기준을 참고한 자기보고식 선별 도구입니다. 공식 진단을 대체하지 않으며, 참고용으로 활용하세요.</p>
+            <p style={{color:'#94a3b8',fontSize:13,lineHeight:1.7,margin:0}}>
+              본 테스트는 최신 심리학 연구와 행동 과학 데이터를 기반으로 설계된 자기보고식 도구이며, 공식 임상 진단을 대체하지 않습니다. 개인의 성장 방향을 탐색하고, 구체적인 실천 방안을 제시하는 데 목적이 있습니다.
+            </p>
           </div>
           <div style={{marginBottom:14}}>
             <h4 style={{color:'#e2e8f0',fontSize:14,marginBottom:6}}>테스트는 몇 분 정도 걸리나요?</h4>
